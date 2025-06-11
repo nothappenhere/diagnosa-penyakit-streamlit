@@ -1,5 +1,8 @@
 import streamlit as st
 from experta import *
+from gtts import gTTS
+import os
+import base64
 
 
 # Definisikan kelas fakta
@@ -98,79 +101,79 @@ class SistemPakarPenyakit(KnowledgeEngine):
 # Informasi penyakit
 penyakit_info = {
     "Asthma": {
-        "deskripsi": "Penyakit saluran pernapasan yang menyebabkan sesak dan batuk.",
-        "penyebab": "Debu, polusi udara, alergi, udara dingin.",
-        "penanganan": "Gunakan inhaler, hindari pemicu, konsultasi dengan dokter.",
+        "deskripsi": "Penyakit saluran pernapasan kronis yang menyebabkan sesak napas, batuk, dan mengi, seringkali dipicu oleh faktor lingkungan atau alergi",
+        "penyebab": "Debu, polusi udara, alergi, udara dingin, infeksi saluran pernapasan, aktivitas fisik berat",
+        "penanganan": "Gunakan inhaler (bronchodilator atau steroid inhalasi), hindari pemicu (seperti debu dan polusi), kontrol stres, dan konsultasi dengan dokter untuk perawatan jangka panjang",
     },
     "Stroke": {
-        "deskripsi": "Kondisi saat suplai darah ke otak terganggu.",
-        "penyebab": "Hipertensi, kolesterol tinggi, merokok.",
-        "penanganan": "Obat pengencer darah, fisioterapi, tindakan medis darurat.",
+        "deskripsi": "Kondisi medis yang terjadi ketika suplai darah ke otak terganggu, menyebabkan kerusakan pada jaringan otak. Gejalanya bisa meliputi kelemahan tubuh, kesulitan berbicara, atau kebingungan",
+        "penyebab": "Hipertensi, kolesterol tinggi, merokok, diabetes, obesitas, dan faktor genetik",
+        "penanganan": "Obat pengencer darah untuk mencegah pembekuan darah, fisioterapi untuk rehabilitasi, intervensi medis darurat (seperti trombolisis atau pembedahan) untuk mengurangi kerusakan otak",
     },
     "Osteoporosis": {
-        "deskripsi": "Pengeroposan tulang yang meningkatkan risiko patah tulang.",
-        "penyebab": "Kurang kalsium, usia tua, keturunan.",
-        "penanganan": "Suplemen kalsium, olahraga beban, terapi hormon.",
+        "deskripsi": "Penyakit yang menyebabkan penurunan kepadatan tulang, sehingga tulang menjadi rapuh dan lebih rentan terhadap patah",
+        "penyebab": "Kurangnya asupan kalsium dan vitamin D, penuaan, gangguan hormonal, keturunan, dan gaya hidup tidak aktif",
+        "penanganan": "Suplemen kalsium dan vitamin D, olahraga beban untuk memperkuat tulang, terapi hormon untuk meningkatkan kepadatan tulang, dan obat-obatan untuk memperlambat kerusakan tulang",
     },
     "Hypertension": {
-        "deskripsi": "Tekanan darah tinggi yang meningkatkan risiko jantung dan stroke.",
-        "penyebab": "Garam berlebih, stres, kurang olahraga.",
-        "penanganan": "Obat tekanan darah, diet sehat, olahraga.",
+        "deskripsi": "Tekanan darah tinggi, suatu kondisi medis di mana tekanan darah terus menerus berada pada angka yang lebih tinggi dari normal, meningkatkan risiko penyakit jantung dan stroke",
+        "penyebab": "Asupan garam berlebih, stres, kurang olahraga, obesitas, genetika, dan kebiasaan merokok",
+        "penanganan": "Obat-obatan untuk menurunkan tekanan darah, diet rendah garam, peningkatan aktivitas fisik, serta pengelolaan stres",
     },
     "Diabetes": {
-        "deskripsi": "Penyakit kronis dengan kadar gula darah tinggi.",
-        "penyebab": "Faktor genetik, pola makan buruk, kurang olahraga.",
-        "penanganan": "Konsumsi makanan sehat, olahraga teratur, obat insulin jika perlu.",
+        "deskripsi": "Penyakit kronis yang ditandai dengan kadar gula darah yang tinggi, akibat gangguan dalam metabolisme insulin",
+        "penyebab": "Faktor genetik, pola makan tidak sehat, obesitas, dan kurangnya aktivitas fisik",
+        "penanganan": "Kontrol gula darah dengan diet sehat, olahraga teratur, pemantauan kadar glukosa, dan penggunaan insulin atau obat oral sesuai kebutuhan",
     },
     "Migraine": {
-        "deskripsi": "Sakit kepala parah disertai mual dan sensitivitas cahaya.",
-        "penyebab": "Stres, hormon, makanan tertentu.",
-        "penanganan": "Obat pereda nyeri, hindari pemicu.",
+        "deskripsi": "Sakit kepala berulang yang seringkali disertai dengan mual, muntah, dan sensitivitas terhadap cahaya dan suara. Migrain dapat berlangsung dari beberapa jam hingga beberapa hari",
+        "penyebab": "Stres, perubahan hormon, pola makan, kurang tidur, dan pemicu lingkungan lainnya seperti cahaya terang dan bau yang kuat",
+        "penanganan": "Penggunaan obat pereda nyeri, obat untuk mencegah serangan migrain, serta menghindari pemicu yang diketahui",
     },
     "Influenza": {
-        "deskripsi": "Infeksi virus yang menyerang saluran pernapasan atas.",
-        "penyebab": "Virus influenza yang menyebar melalui udara.",
-        "penanganan": "Istirahat, konsumsi cairan, obat antivirus jika perlu.",
+        "deskripsi": "Infeksi virus yang menyerang saluran pernapasan atas, menyebabkan gejala seperti demam, batuk, nyeri tubuh, dan kelelahan",
+        "penyebab": "Virus influenza yang menyebar melalui udara dan kontak langsung dengan orang yang terinfeksi",
+        "penanganan": "Istirahat yang cukup, konsumsi cairan hangat, obat antivirus (seperti oseltamivir), serta vaksinasi flu tahunan untuk pencegahan",
     },
     "Pneumonia": {
-        "deskripsi": "Infeksi paru-paru yang menyebabkan peradangan.",
-        "penyebab": "Bakteri, virus, atau jamur.",
-        "penanganan": "Antibiotik, cairan infus, perawatan rumah sakit.",
+        "deskripsi": "Infeksi pada paru-paru yang menyebabkan peradangan, gejalanya bisa meliputi batuk, sesak napas, demam, dan nyeri dada",
+        "penyebab": "Bakteri, virus, atau jamur yang menginfeksi paru-paru, seringkali setelah infeksi saluran pernapasan atas",
+        "penanganan": "Antibiotik atau antiviral untuk infeksi bakteri atau virus, cairan infus untuk mencegah dehidrasi, dan perawatan rumah sakit untuk kasus yang lebih parah",
     },
     "Bronchitis": {
-        "deskripsi": "Peradangan saluran bronkus di paru-paru.",
-        "penyebab": "Infeksi virus, merokok.",
-        "penanganan": "Istirahat, minum cukup air, obat batuk.",
+        "deskripsi": "Peradangan pada saluran bronkus yang membawa udara ke paru-paru. Gejalanya termasuk batuk berdahak, sesak napas, dan rasa nyeri pada dada",
+        "penyebab": "Infeksi virus (terutama), merokok, atau paparan polusi udara",
+        "penanganan": "Istirahat, minum cukup air, obat batuk atau dekongestan, serta menghindari asap rokok dan polusi udara",
     },
     "Hyperthyroidism": {
-        "deskripsi": "Kelenjar tiroid terlalu aktif menghasilkan hormon.",
-        "penyebab": "Penyakit Graves, nodul tiroid.",
-        "penanganan": "Obat anti-tiroid, yodium radioaktif, operasi.",
+        "deskripsi": "Kondisi di mana kelenjar tiroid menghasilkan hormon tiroid dalam jumlah berlebih, yang dapat menyebabkan peningkatan metabolisme tubuh",
+        "penyebab": "Penyakit Graves, nodul tiroid, atau tiroiditis",
+        "penanganan": "Obat anti-tiroid untuk mengurangi produksi hormon, terapi yodium radioaktif untuk menghancurkan sebagian jaringan tiroid, atau pembedahan untuk mengangkat kelenjar tiroid",
     },
     "Hypothyroidism": {
-        "deskripsi": "Kelenjar tiroid kurang aktif menghasilkan hormon.",
-        "penyebab": "Autoimun, kekurangan yodium.",
-        "penanganan": "Terapi hormon tiroid.",
+        "deskripsi": "Kondisi di mana kelenjar tiroid kurang aktif dalam memproduksi hormon tiroid, yang dapat memperlambat metabolisme tubuh",
+        "penyebab": "Gangguan autoimun seperti Hashimoto's thyroiditis, kekurangan yodium, atau pengobatan sebelumnya untuk hipertiroidisme",
+        "penanganan": "Penggantian hormon tiroid melalui terapi hormon tiroid (levothyroxine)",
     },
     "Osteoarthritis": {
-        "deskripsi": "Kerusakan pada tulang rawan sendi.",
-        "penyebab": "Penuaan, cedera sendi, obesitas.",
-        "penanganan": "Fisioterapi, obat nyeri, operasi sendi bila parah.",
+        "deskripsi": "Penyakit degeneratif sendi yang terjadi akibat kerusakan pada tulang rawan, menyebabkan rasa sakit dan kekakuan pada sendi",
+        "penyebab": "Penuaan, cedera sendi sebelumnya, obesitas, dan penggunaan sendi yang berlebihan",
+        "penanganan": "Fisioterapi untuk memperkuat otot sekitar sendi, obat anti-inflamasi untuk mengurangi peradangan, dan operasi penggantian sendi jika diperlukan",
     },
     "Kidney Cancer": {
-        "deskripsi": "Kanker yang berasal dari jaringan ginjal.",
-        "penyebab": "Merokok, obesitas, faktor genetik.",
-        "penanganan": "Operasi pengangkatan, imunoterapi, kemoterapi.",
+        "deskripsi": "Kanker yang dimulai pada ginjal, seringkali tidak menimbulkan gejala pada tahap awal",
+        "penyebab": "Merokok, obesitas, hipertensi, dan riwayat keluarga dengan kanker ginjal",
+        "penanganan": "Operasi untuk mengangkat ginjal yang terkena, imunoterapi, kemoterapi, atau terapi target",
     },
     "Common Cold": {
-        "deskripsi": "Infeksi ringan saluran pernapasan atas.",
-        "penyebab": "Virus rhinovirus.",
-        "penanganan": "Istirahat, cairan hangat, obat pereda gejala.",
+        "deskripsi": "Infeksi ringan yang disebabkan oleh berbagai virus, terutama rhinovirus, yang menyerang saluran pernapasan atas",
+        "penyebab": "Virus rhinovirus yang dapat menyebar melalui tetesan udara atau kontak langsung",
+        "penanganan": "Istirahat yang cukup, konsumsi cairan hangat, obat pereda gejala seperti dekongestan dan parasetamol",
     },
     "Liver Cancer": {
-        "deskripsi": "Kanker yang berasal dari sel hati.",
-        "penyebab": "Hepatitis B/C, konsumsi alkohol berlebih.",
-        "penanganan": "Operasi, kemoterapi, transplantasi hati.",
+        "deskripsi": "Kanker yang dimulai pada hati, sering kali berkembang setelah kondisi hati kronis seperti sirosis atau infeksi hepatitis",
+        "penyebab": "Hepatitis B dan C, konsumsi alkohol berlebihan, dan riwayat keluarga dengan kanker hati",
+        "penanganan": "Operasi pengangkatan tumor, kemoterapi, imunoterapi, atau transplantasi hati untuk kasus yang lebih parah",
     },
 }
 
@@ -181,11 +184,13 @@ def diagnosa_penyakit():
         st.session_state["logged_in"] = False
     if "guest_diagnosis_count" not in st.session_state:
         st.session_state["guest_diagnosis_count"] = 0
+    if "play_audio" not in st.session_state:
+        st.session_state["play_audio"] = False
 
     # Streamlit Interface
     st.title(":stethoscope: Diagnosa Penyakit Umum")
 
-    # Cek batasan
+    # Cek batasan untuk tamu
     if (
         not st.session_state["logged_in"]
         and st.session_state["guest_diagnosis_count"] >= 3
@@ -201,24 +206,34 @@ def diagnosa_penyakit():
         cough = st.selectbox("Batuk?", ["Ya", "Tidak"])
         fatigue = st.selectbox("Kelelahan?", ["Ya", "Tidak"])
         difficulty_breathing = st.selectbox("Kesulitan Bernapas?", ["Ya", "Tidak"])
-        age = st.slider("Usia", 1, 100, 20)
-        gender = st.selectbox("Jenis Kelamin", ["Laki-laki", "Perempuan"])
         blood_pressure = st.selectbox("Tekanan Darah", ["Rendah", "Normal", "Tinggi"])
         cholesterol = st.selectbox("Level Kolesterol", ["Normal", "Tinggi"])
+        age = st.slider("Usia", 1, 100, 25)
+        gender = st.selectbox("Jenis Kelamin", ["Laki-laki", "Perempuan"])
 
         submitted = st.form_submit_button("Diagnosa", type="primary")
 
     if submitted:
-        # Naikkan counter jika user belum login
+        # Tambah counter jika user belum login
         if not st.session_state["logged_in"]:
             st.session_state["guest_diagnosis_count"] += 1
 
+        # Reset diagnosis
         st.session_state["diagnosis"] = "Tidak ditemukan diagnosis yang cocok."
+
+        # Siapkan engine dan fakta
         engine = SistemPakarPenyakit()
         engine.reset()
-        age_category = (
-            "Di atas 50" if age > 50 else "Di atas 45" if age > 45 else "Di bawah 45"
-        )
+
+        # Kategorisasi usia
+        if age > 50:
+            age_category = "Di atas 50"
+        elif age > 45:
+            age_category = "Di atas 45"
+        else:
+            age_category = "Di bawah 45"
+
+        # Masukkan fakta gejala
         engine.declare(
             Gejala(
                 fever=fever,
@@ -233,19 +248,64 @@ def diagnosa_penyakit():
         )
         engine.run()
 
+    # Tampilkan batas tamu
     if not st.session_state["logged_in"]:
         sisa = 3 - st.session_state["guest_diagnosis_count"]
         st.info(f"Anda dapat melakukan {sisa} diagnosa lagi sebelum perlu login.")
 
+    # Tampilkan hasil diagnosa
     if "diagnosis" in st.session_state:
+        st.divider()
+
         hasil = st.session_state["diagnosis"].replace("Kemungkinan: ", "")
         info = penyakit_info.get(hasil)
 
-        st.subheader("🔍 Hasil Diagnosa:")
-        st.success(st.session_state["diagnosis"])
+        col1, col2 = st.columns(spec=2, vertical_alignment="center")
 
+        col1.metric(
+            label="Hasil Diagnosa",
+            value=hasil,
+            delta="Kemungkinan",
+            delta_color="inverse",
+            border=True,
+        )
+
+        # Ucapkan dengan gTTS dalam Bahasa Indonesia
+        ucapan = f"Hasil diagnosa Anda adalah kemungkinan {hasil}.\n\n{hasil} merupakan: {info['deskripsi']}.\n\n{hasil} disebabkan oleh: {info['penyebab']}.\n\nPenanganan yang disarankan adalah: {info['penanganan']}."
+        if col2.button("🔊 Putar Suara Diagnosa", use_container_width=True):
+            st.session_state["play_audio"] = True
+
+        col2.download_button(
+            label="Download hasil diganosis",
+            data=ucapan,
+            file_name="diagnosis_result.txt",
+            on_click="ignore",
+            type="primary",
+            icon=":material/download:",
+            use_container_width=True,
+        )
+
+        # Setelah tombol ditekan (jika True), jalankan fungsi play_audio
+        if st.session_state["play_audio"]:
+            play_audio(ucapan, True)
+            st.session_state["play_audio"] = (
+                False  # Reset agar tidak memutar otomatis lagi
+            )
+
+        st.divider()
         if info:
-            st.markdown(f"**Deskripsi:** {info['deskripsi']}")
-            st.markdown(f"**Penyebab Umum:** {info['penyebab']}")
-            st.markdown(f"**Penanganan:** {info['penanganan']}")
-            # st.image(info['gambar'], caption=hasil, use_column_width=True)
+
+            st.markdown("### 💡 Saran Kesehatan Berdasarkan Data Anda")
+            st.info(f"**Deskripsi:** {info['deskripsi']}")
+            st.warning(f"**Penyebab Umum:** {info['penyebab']}")
+            st.success(f"**Penanganan:** {info['penanganan']}")
+
+
+def play_audio(text, autoplay):
+    tts = gTTS(text, lang="id")  # Gunakan bahasa Indonesia
+    tts.save("output.mp3")
+
+    # Tampilkan audio di Streamlit
+    with open("output.mp3", "rb") as audio_file:
+        audio_bytes = audio_file.read()
+        st.audio(audio_bytes, format="audio/mp3", autoplay=autoplay)

@@ -1,11 +1,11 @@
 import streamlit as st
-from pages import auth, homepage, sistem_pakar
+from pages import homepage, auth, user, sistem_pakar
 
 
 # Streamlit Interface
 st.set_page_config(
-    page_title="Sistem Pakar",
-    page_icon="🩺",
+    page_title="Diganosa Penyakit | Sistem Pakar",
+    page_icon=":material/stethoscope:",
     layout="centered",
     initial_sidebar_state="auto",
     menu_items={
@@ -14,13 +14,19 @@ st.set_page_config(
     },
 )
 
-pages = {
+# Default session state
+if "logged_in" not in st.session_state:
+    st.session_state["logged_in"] = False
+if "username" not in st.session_state:
+    st.session_state["username"] = ""
+
+# Define pages
+pages_without_login = {
     "Main": [
         st.Page(homepage.show_homepage, title="Home", icon=":material/home:"),
-        # if st.session_state.get("logged_in"):
         st.Page(
             sistem_pakar.diagnosa_penyakit,
-            title="Diagnoses",
+            title="Diagnose",
             icon=":material/stethoscope:",
         ),
     ],
@@ -32,16 +38,31 @@ pages = {
     ],
 }
 
-pg = st.navigation(pages)
+pages_with_login = {
+    "Main": [
+        st.Page(homepage.show_homepage, title="Home", icon=":material/home:"),
+        st.Page(
+            sistem_pakar.diagnosa_penyakit,
+            title="Diagnose",
+            icon=":material/stethoscope:",
+        ),
+    ],
+    "Account": [
+        st.Page(
+            user.user_profile,
+            title="Profile",
+            icon=":material/account_circle:",
+        ),
+        # st.Page(user.user_profile, title="History", icon=":material/browse_activity:"),
+        st.Page(auth.logout, title="Logout", icon=":material/logout:"),
+    ],
+}
+
+
+# Menentukan tampilan halaman berdasarkan login
+if st.session_state["logged_in"]:
+    pg = st.navigation(pages_with_login)
+else:
+    pg = st.navigation(pages_without_login)
+
 pg.run()
-
-if st.session_state.get("logged_in"):
-
-    # pg = st.navigation(
-    #     [st.Page("sistem_pakar.py", title="Diagnosa", icon=":material/stethoscope:")]
-    # )
-    # pg.run()
-
-    if st.sidebar.button("Logout", type="tertiary", icon=":material/logout:"):
-        st.toast("Berhasil logout!", icon=":lock:")
-        auth.logout()

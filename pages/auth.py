@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
+import time
 
 USER_FILE = "dataset/users.csv"
 
@@ -14,7 +15,7 @@ def load_users():
 
 def register_page():
     st.title("🔐 Registrasi Pengguna")
-    # Cek batasan
+
     if st.session_state["logged_in"]:
         st.warning(
             "Anda harus logout terlebih dahulu sebelum dapat membuat akun baru.",
@@ -22,10 +23,30 @@ def register_page():
         )
         st.stop()
 
-    full_name = st.text_input("Nama Lengkap", placeholder="Masukan Nama Lengkap")
-    username = st.text_input("Username", placeholder="Masukan Username")
+    # Inisialisasi session state untuk form jika belum ada
+    for key in ["reg_full_name", "reg_username", "reg_password"]:
+        if key not in st.session_state:
+            st.session_state[key] = ""
+
+    # Input form dengan session_state
+    full_name = st.text_input(
+        "Nama Lengkap",
+        placeholder="Masukkan nama lengkap",
+        value=st.session_state["reg_full_name"],
+        key="reg_full_name",
+    )
+    username = st.text_input(
+        "Username",
+        placeholder="Masukkan username",
+        value=st.session_state["reg_username"],
+        key="reg_username",
+    )
     password = st.text_input(
-        "Password", type="password", placeholder="Masukan password"
+        "Password",
+        placeholder="Masukkan password",
+        type="password",
+        value=st.session_state["reg_password"],
+        key="reg_password",
     )
 
     if st.button("Buat Akun", type="primary"):
@@ -45,11 +66,17 @@ def register_page():
         new_user = pd.DataFrame(
             [{"full_name": full_name, "username": username, "password": password}]
         )
-
         users_df = pd.concat([users_df, new_user], ignore_index=True)
         users_df.to_csv(USER_FILE, index=False)
 
+        # Reset input
+        # st.session_state["reg_full_name"] = ""
+        # st.session_state["reg_username"] = ""
+        # st.session_state["reg_password"] = ""
+
         st.toast("Akun berhasil dibuat! Silakan login.", icon=":material/check:")
+        time.sleep(1)
+        st.rerun()
 
 
 def login_page():
@@ -77,6 +104,8 @@ def login_page():
                 f"Selamat datang, {username}!",
                 icon=":material/check:",
             )
+            time.sleep(1)
+            st.rerun()
             st.session_state.setdefault("riwayat_diagnosa", [])
         else:
             st.toast(
@@ -89,3 +118,6 @@ def logout():
     st.session_state["logged_in"] = False
     st.session_state["username"] = ""
     st.session_state["riwayat_diagnosa"] = []
+    st.toast("Berhasil logout!", icon=":material/check:")
+    time.sleep(1)
+    st.rerun()
