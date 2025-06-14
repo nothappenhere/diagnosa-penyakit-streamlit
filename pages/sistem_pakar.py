@@ -1,9 +1,6 @@
 import streamlit as st
 from experta import *
 from gtts import gTTS
-import os
-import base64
-
 
 # Definisikan kelas fakta
 class Gejala(Fact):
@@ -202,6 +199,7 @@ def diagnosa_penyakit():
 
     with st.form("form"):
         st.write("Silakan isi gejala berikut:")
+
         fever = st.selectbox("Demam?", ["Ya", "Tidak"])
         cough = st.selectbox("Batuk?", ["Ya", "Tidak"])
         fatigue = st.selectbox("Kelelahan?", ["Ya", "Tidak"])
@@ -261,7 +259,6 @@ def diagnosa_penyakit():
         info = penyakit_info.get(hasil)
 
         col1, col2 = st.columns(spec=2, vertical_alignment="center")
-
         col1.metric(
             label="Hasil Diagnosa",
             value=hasil,
@@ -296,9 +293,9 @@ def diagnosa_penyakit():
         if info:
 
             st.markdown("### 💡 Saran Kesehatan Berdasarkan Data Anda")
-            st.info(f"**Deskripsi:** {info['deskripsi']}")
-            st.warning(f"**Penyebab Umum:** {info['penyebab']}")
-            st.success(f"**Penanganan:** {info['penanganan']}")
+            st.info(f"**Deskripsi:** {info['deskripsi']}.")
+            st.warning(f"**Penyebab Umum:** {info['penyebab']}.")
+            st.success(f"**Penanganan:** {info['penanganan']}.")
 
 
 def play_audio(text, autoplay):
