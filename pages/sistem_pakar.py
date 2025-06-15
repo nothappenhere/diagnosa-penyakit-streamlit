@@ -2,6 +2,7 @@ import streamlit as st
 from experta import *
 from gtts import gTTS
 
+
 # Definisikan kelas fakta
 class Gejala(Fact):
     pass
@@ -197,19 +198,158 @@ def diagnosa_penyakit():
         )
         st.stop()
 
-    with st.form("form"):
+    with st.container(border=True):
         st.write("Silakan isi gejala berikut:")
 
-        fever = st.selectbox("Demam?", ["Ya", "Tidak"])
-        cough = st.selectbox("Batuk?", ["Ya", "Tidak"])
-        fatigue = st.selectbox("Kelelahan?", ["Ya", "Tidak"])
-        difficulty_breathing = st.selectbox("Kesulitan Bernapas?", ["Ya", "Tidak"])
-        blood_pressure = st.selectbox("Tekanan Darah", ["Rendah", "Normal", "Tinggi"])
-        cholesterol = st.selectbox("Level Kolesterol", ["Normal", "Tinggi"])
-        age = st.slider("Usia", 1, 100, 25)
-        gender = st.selectbox("Jenis Kelamin", ["Laki-laki", "Perempuan"])
+        with st.expander("Demam?", icon=":material/sick:"):
+            deskripsi = """
+                Demam adalah kondisi ketika suhu tubuh meningkat di atas normal, biasanya di atas 37.5°C.
+                \nIni merupakan respons alami tubuh terhadap infeksi bakteri atau virus, dan menandakan bahwa sistem kekebalan sedang bekerja.
+                \nSelain suhu tubuh tinggi, gejala demam juga bisa disertai menggigil, sakit kepala, dan kelelahan.
+                \nMeskipun sebagian besar demam bersifat ringan dan bisa sembuh sendiri, demam tinggi yang berkepanjangan dapat mengindikasikan kondisi serius yang memerlukan penanganan medis.
+            """
 
-        submitted = st.form_submit_button("Diagnosa", type="primary")
+            st.markdown(deskripsi)
+            if st.button(
+                "🔊 Baca penjelasan", key="baca_fever", use_container_width=True
+            ):
+                play_audio(deskripsi, autoplay=True)
+            st.divider()
+            fever = st.selectbox(
+                "Apakah Anda mengalami demam:", ["Ya", "Tidak"], key="fever"
+            )
+
+        with st.expander("Batuk?", icon=":material/coronavirus:"):
+            deskripsi = """
+                Batuk adalah refleks tubuh untuk membersihkan saluran napas dari lendir, debu, atau iritasi lain.
+                \nBatuk bisa disebabkan oleh infeksi virus seperti flu dan pilek, alergi, asma, atau kondisi kronis seperti bronkitis dan pneumonia.
+                \nBatuk yang berlangsung lebih dari dua minggu atau disertai darah dan nyeri dada perlu dievaluasi lebih lanjut oleh tenaga medis.
+                \nMengetahui jenis batuk (kering, berdahak, atau kronis) dapat membantu menentukan penyebab dan pengobatan yang tepat.
+            """
+
+            st.markdown(deskripsi)
+            if st.button(
+                "🔊 Baca penjelasan", key="baca_cough", use_container_width=True
+            ):
+                play_audio(deskripsi, autoplay=True)
+            st.divider()
+            cough = st.selectbox(
+                "Apakah Anda mengalami batuk:", ["Ya", "Tidak"], key="cough"
+            )
+
+        with st.expander("Kelelahan?", icon=":material/dark_mode:"):
+            deskripsi = """
+                Kelelahan adalah perasaan lelah atau kurang energi yang berkepanjangan dan tidak membaik setelah istirahat. 
+                \nHal ini bisa disebabkan oleh kurang tidur, stres, anemia, diabetes, gangguan tiroid, atau infeksi kronis. 
+                \nKelelahan yang menetap dapat memengaruhi produktivitas, suasana hati, dan kualitas hidup. 
+                \nJika disertai dengan gejala lain seperti sesak napas, nyeri dada, atau penurunan berat badan, sebaiknya segera periksa ke dokter.
+            """
+
+            st.markdown(deskripsi)
+            if st.button(
+                "🔊 Baca penjelasan", key="baca_fatigue", use_container_width=True
+            ):
+                play_audio(deskripsi, autoplay=True)
+            st.divider()
+            fatigue = st.selectbox(
+                "Apakah Anda sering kelelahan:", ["Ya", "Tidak"], key="fatigue"
+            )
+
+        with st.expander("Kesulitan Bernapas?", icon=":material/pulmonology:"):
+            deskripsi = """
+                \nKesulitan bernapas atau sesak napas (dispnea) adalah kondisi ketika seseorang merasa napasnya pendek atau tidak cukup udara. 
+                \nIni bisa disebabkan oleh gangguan paru-paru seperti asma, pneumonia, atau penyakit paru obstruktif kronis (PPOK), serta masalah jantung seperti gagal jantung. 
+                \nGejala ini bisa terjadi tiba-tiba atau perlahan dan dapat diperparah dengan aktivitas. 
+                \nJika disertai nyeri dada, bibir membiru, atau kehilangan kesadaran, ini merupakan kondisi darurat medis.
+            """
+
+            st.markdown(deskripsi)
+            if st.button(
+                "🔊 Baca penjelasan",
+                key="baca_difficulty_breathing",
+                use_container_width=True,
+            ):
+                play_audio(deskripsi, autoplay=True)
+            st.divider()
+            difficulty_breathing = st.selectbox(
+                "Apakah Anda kesulitan bernapas:", ["Ya", "Tidak"], key="breath"
+            )
+
+        with st.expander("Tekanan Darah", icon=":material/blood_pressure:"):
+            deskripsi = """
+                \nTekanan darah adalah ukuran kekuatan darah terhadap dinding arteri saat dipompa oleh jantung. 
+                \nTekanan darah normal berkisar antara 90/60 mmHg hingga 120/80 mmHg. 
+                \nTekanan darah rendah (hipotensi) dapat menyebabkan pusing dan pingsan, sedangkan tekanan darah tinggi (hipertensi) bisa merusak jantung, ginjal, dan pembuluh darah dalam jangka panjang. 
+                \nPemantauan tekanan darah secara rutin penting untuk mencegah komplikasi serius.
+            """
+
+            st.markdown(deskripsi)
+            if st.button(
+                "🔊 Baca penjelasan",
+                key="baca_blood_pressure",
+                use_container_width=True,
+            ):
+                play_audio(deskripsi, autoplay=True)
+            st.divider()
+            blood_pressure = st.selectbox(
+                "Pilih level tekanan darah Anda:",
+                ["Rendah", "Normal", "Tinggi"],
+                key="bp",
+            )
+
+        with st.expander("Level Kolesterol", icon=":material/lunch_dining:"):
+            deskripsi = """
+                \nKolesterol adalah zat lemak yang penting untuk fungsi tubuh, tetapi kadar kolesterol yang tinggi dapat membahayakan kesehatan. 
+                \nKolesterol tinggi sering kali tidak menunjukkan gejala namun dapat menyumbat pembuluh darah dan meningkatkan risiko penyakit jantung dan stroke. 
+                \nFaktor risiko termasuk pola makan tinggi lemak jenuh, kurang olahraga, merokok, dan faktor genetik. 
+                \nPenting untuk melakukan pemeriksaan darah secara rutin untuk memantau kadar kolesterol Anda.
+            """
+
+            st.markdown(deskripsi)
+            if st.button(
+                "🔊 Baca penjelasan", key="baca_cholesterol", use_container_width=True
+            ):
+                play_audio(deskripsi, autoplay=True)
+            st.divider()
+            cholesterol = st.selectbox(
+                "Pilih level kolesterol Anda:", ["Normal", "Tinggi"], key="cholesterol"
+            )
+
+        with st.expander("Usia", icon=":material/calendar_month:"):
+            deskripsi = """
+                \nUsia merupakan salah satu faktor risiko utama untuk berbagai kondisi kesehatan. 
+                \nSeiring bertambahnya usia, risiko terkena penyakit jantung, diabetes, tekanan darah tinggi, dan kanker meningkat. 
+                \nPerubahan fisiologis seperti metabolisme yang melambat dan sistem kekebalan yang melemah juga membuat lansia lebih rentan terhadap infeksi. 
+                \nMengetahui risiko terkait usia membantu dalam mengambil langkah pencegahan sejak dini.
+            """
+
+            st.markdown(deskripsi)
+            if st.button(
+                "🔊 Baca penjelasan", key="baca_age", use_container_width=True
+            ):
+                play_audio(deskripsi, autoplay=True)
+            st.divider()
+            age = st.slider("Masukkan usia Anda:", 1, 100, 25, key="age")
+
+        with st.expander("Jenis Kelamin", icon=":material/wc:"):
+            deskripsi = """
+                \nJenis kelamin dapat memengaruhi kecenderungan seseorang terhadap penyakit tertentu. 
+                \nMisalnya, pria lebih sering mengalami penyakit jantung di usia muda, sedangkan wanita lebih berisiko terkena osteoporosis dan penyakit autoimun. 
+                \nSelain faktor biologis, perbedaan gaya hidup dan akses kesehatan antara laki-laki dan perempuan juga dapat berpengaruh. 
+                \nMemahami perbedaan ini penting untuk pendekatan kesehatan yang lebih personal dan efektif.
+            """
+
+            st.markdown(deskripsi)
+            if st.button(
+                "🔊 Baca penjelasan", key="baca_gender", use_container_width=True
+            ):
+                play_audio(deskripsi, autoplay=True)
+            st.divider()
+            gender = st.selectbox(
+                "Pilih jenis kelamin Anda:", ["Laki-laki", "Perempuan"], key="gender"
+            )
+
+        submitted = st.button("Diagnosa", type="primary", use_container_width=True)
 
     if submitted:
         # Tambah counter jika user belum login
@@ -269,7 +409,7 @@ def diagnosa_penyakit():
 
         # Ucapkan dengan gTTS dalam Bahasa Indonesia
         ucapan = f"Hasil diagnosa Anda adalah kemungkinan {hasil}.\n\n{hasil} merupakan: {info['deskripsi']}.\n\n{hasil} disebabkan oleh: {info['penyebab']}.\n\nPenanganan yang disarankan adalah: {info['penanganan']}."
-        if col2.button("🔊 Putar Suara Diagnosa", use_container_width=True):
+        if col2.button("🔊 Putar Suara Hasil Diagnosa", use_container_width=True):
             st.session_state["play_audio"] = True
 
         col2.download_button(

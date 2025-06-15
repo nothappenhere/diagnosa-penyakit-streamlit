@@ -6,7 +6,7 @@ from pages import homepage, auth, user, sistem_pakar
 st.set_page_config(
     page_title="Diganosa Penyakit | Sistem Pakar",
     page_icon=":material/stethoscope:",
-    layout="centered",
+    layout="wide",
     initial_sidebar_state="auto",
     menu_items={
         "Report a Bug": "https://github.com/nothappenhere/",

@@ -20,3 +20,6 @@ __pycache__/
 # Abaikan file Streamlit yang dibuat otomatis
 # .streamlit/config.toml
 # .streamlit/secrets.toml
+
+# Abaikan file audio hasil gtts
+output.mp3
