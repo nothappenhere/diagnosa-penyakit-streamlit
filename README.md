@@ -1,12 +1,13 @@
 # **Sistem Pakar Diagnosa Penyakit**
 
-Proyek ini merupakan aplikasi **Sistem Pakar** berbasis web yang dapat membantu pengguna dalam **mendiagnosa penyakit** berdasarkan gejala yang dialami. Aplikasi ini dibangun menggunakan framework **[Streamlit](https://streamlit.io/)** untuk antarmuka pengguna dan **[Experta](https://github.com/nilp0inter/experta)** untuk logika sistem pakarnya.
+Proyek ini merupakan aplikasi **Sistem Pakar** berbasis web yang dapat membantu pengguna dalam **mendiagnosa penyakit** berdasarkan gejala yang dialami. Aplikasi ini dibangun menggunakan framework **[Streamlit](https://streamlit.io/)** untuk antarmuka pengguna dan **[Experta](https://github.com/nilp0inter/experta)** untuk logika sistem pakar serta **[gTTS](https://github.com/pndurette/gTTS)** sebagai *Text to Speech* dan **[streamlit-mic-recorder](https://github.com/B4PT0R/streamlit-mic-recorder)** sebagai *Speech to Text*.
 
 ## Fitur Utama
 - Input gejala oleh pengguna
 - Diagnosa otomatis berdasarkan aturan (*rule-based*)
 - Penjelasan tentang penyakit (deskripsi, penyebab, penanganan)
 - Antarmuka web sederhana berbasis Streamlit
+- Mendukung teks ke ucapan (*Text to Speech*) dan ucapan ke teks (*Speech to Text*)
 - Bisa diperluas untuk dataset dan gejala tambahan
 
 ## Teknologi & Library
@@ -14,6 +15,8 @@ Proyek ini merupakan aplikasi **Sistem Pakar** berbasis web yang dapat membantu 
 - [Streamlit](https://streamlit.io/)
 - [Experta](https://github.com/nilp0inter/experta) – engine sistem pakar berbasis Python
 - [Pandas](https://pandas.pydata.org/) – untuk pengolahan data
+- [gTTS](https://github.com/pndurette/gTTS) – untuk teks ke ucapan (*Text to Speech*)
+- [streamlit-mic-recorder](https://github.com/B4PT0R/streamlit-mic-recorder) – untuk ucapan ke teks (*Speech to Text*)
 
 ## Cara Install
 1. Pastikan Python `3.9.1` sudah terinstall di komputer Anda.

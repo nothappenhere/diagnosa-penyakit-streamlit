@@ -1,6 +1,7 @@
 import streamlit as st
 from experta import *
 from gtts import gTTS
+from streamlit_mic_recorder import speech_to_text
 
 
 # Definisikan kelas fakta
@@ -214,10 +215,10 @@ def diagnosa_penyakit():
                 "🔊 Baca penjelasan", key="baca_fever", use_container_width=True
             ):
                 play_audio(deskripsi, autoplay=True)
+
             st.divider()
-            fever = st.selectbox(
-                "Apakah Anda mengalami demam:", ["Ya", "Tidak"], key="fever"
-            )
+
+            fever = input_stt("Apakah Anda mengalami demam?", "fever_val")
 
         with st.expander("Batuk?", icon=":material/coronavirus:"):
             deskripsi = """
@@ -232,10 +233,10 @@ def diagnosa_penyakit():
                 "🔊 Baca penjelasan", key="baca_cough", use_container_width=True
             ):
                 play_audio(deskripsi, autoplay=True)
+
             st.divider()
-            cough = st.selectbox(
-                "Apakah Anda mengalami batuk:", ["Ya", "Tidak"], key="cough"
-            )
+
+            cough = input_stt("Apakah Anda mengalami batuk?", "cough_val")
 
         with st.expander("Kelelahan?", icon=":material/dark_mode:"):
             deskripsi = """
@@ -250,14 +251,14 @@ def diagnosa_penyakit():
                 "🔊 Baca penjelasan", key="baca_fatigue", use_container_width=True
             ):
                 play_audio(deskripsi, autoplay=True)
+
             st.divider()
-            fatigue = st.selectbox(
-                "Apakah Anda sering kelelahan:", ["Ya", "Tidak"], key="fatigue"
-            )
+
+            fatigue = input_stt("Apakah Anda sering kelelahan?", "fatigue_val")
 
         with st.expander("Kesulitan Bernapas?", icon=":material/pulmonology:"):
             deskripsi = """
-                \nKesulitan bernapas atau sesak napas (dispnea) adalah kondisi ketika seseorang merasa napasnya pendek atau tidak cukup udara. 
+                Kesulitan bernapas atau sesak napas (dispnea) adalah kondisi ketika seseorang merasa napasnya pendek atau tidak cukup udara. 
                 \nIni bisa disebabkan oleh gangguan paru-paru seperti asma, pneumonia, atau penyakit paru obstruktif kronis (PPOK), serta masalah jantung seperti gagal jantung. 
                 \nGejala ini bisa terjadi tiba-tiba atau perlahan dan dapat diperparah dengan aktivitas. 
                 \nJika disertai nyeri dada, bibir membiru, atau kehilangan kesadaran, ini merupakan kondisi darurat medis.
@@ -270,9 +271,11 @@ def diagnosa_penyakit():
                 use_container_width=True,
             ):
                 play_audio(deskripsi, autoplay=True)
+
             st.divider()
-            difficulty_breathing = st.selectbox(
-                "Apakah Anda kesulitan bernapas:", ["Ya", "Tidak"], key="breath"
+
+            difficulty_breathing = input_stt(
+                "Apakah Anda kesulitan bernapas?", "difficulty_breathing_val"
             )
 
         with st.expander("Tekanan Darah", icon=":material/blood_pressure:"):
@@ -290,11 +293,11 @@ def diagnosa_penyakit():
                 use_container_width=True,
             ):
                 play_audio(deskripsi, autoplay=True)
+
             st.divider()
-            blood_pressure = st.selectbox(
-                "Pilih level tekanan darah Anda:",
-                ["Rendah", "Normal", "Tinggi"],
-                key="bp",
+
+            blood_pressure = input_stt(
+                "Level tekanan darah Anda?", "blood_pressure_val", key="bp"
             )
 
         with st.expander("Level Kolesterol", icon=":material/lunch_dining:"):
@@ -310,9 +313,11 @@ def diagnosa_penyakit():
                 "🔊 Baca penjelasan", key="baca_cholesterol", use_container_width=True
             ):
                 play_audio(deskripsi, autoplay=True)
+
             st.divider()
-            cholesterol = st.selectbox(
-                "Pilih level kolesterol Anda:", ["Normal", "Tinggi"], key="cholesterol"
+
+            cholesterol = input_stt(
+                "Level kolesterol Anda?", "cholesterol_val", key="cholesterol"
             )
 
         with st.expander("Usia", icon=":material/calendar_month:"):
@@ -344,10 +349,10 @@ def diagnosa_penyakit():
                 "🔊 Baca penjelasan", key="baca_gender", use_container_width=True
             ):
                 play_audio(deskripsi, autoplay=True)
+
             st.divider()
-            gender = st.selectbox(
-                "Pilih jenis kelamin Anda:", ["Laki-laki", "Perempuan"], key="gender"
-            )
+
+            gender = input_stt("Jenis kelamin Anda?", "gender_val", key="gender")
 
         submitted = st.button("Diagnosa", type="primary", use_container_width=True)
 
@@ -446,3 +451,123 @@ def play_audio(text, autoplay):
     with open("output.mp3", "rb") as audio_file:
         audio_bytes = audio_file.read()
         st.audio(audio_bytes, format="audio/mp3", autoplay=autoplay)
+
+
+def input_stt(prompt, state_key, key=None):
+    st.write(prompt)
+
+    st.session_state.setdefault(state_key, "Tidak")
+    col_sel, div, col_mic = st.columns([3, 0.35, 3], vertical_alignment="center")
+
+    # Selectbox
+    def select_choice(key):
+        if key in ["bp", "cholesterol"]:
+            return ["Rendah", "Normal", "Tinggi"]
+        elif key == "gender":
+            return ["Laki-laki", "Perempuan"]
+        else:
+            return ["Ya", "Tidak"]
+
+    pilihan = select_choice(key)
+    nilai_saat_ini = st.session_state[state_key]
+
+    # Fallback ke indeks pertama jika nilainya tidak cocok
+    if nilai_saat_ini in pilihan:
+        index_terpilih = pilihan.index(nilai_saat_ini)
+    else:
+        index_terpilih = 0
+        st.session_state[state_key] = pilihan[0]  # reset ke default aman
+
+    jawab = col_sel.selectbox(
+        prompt,
+        pilihan,
+        index=index_terpilih,
+        label_visibility="collapsed",
+    )
+
+    div.markdown("Atau")
+
+    # Mic
+    with col_mic:
+        trans = speech_to_text(
+            language="id-ID",
+            start_prompt="🎙️ Mulai Bicara",
+            stop_prompt="⏹️ Selesai",
+            just_once=True,
+            key=f"stt_{state_key}",
+            use_container_width=True,
+        )
+
+    if trans:
+        hasil = voice_to_option(trans)
+        if hasil in [
+            "Ya",
+            "Tidak",
+            "Rendah",
+            "Normal",
+            "Tinggi",
+            "Laki-laki",
+            "Perempuan",
+        ]:
+            st.session_state[state_key] = hasil
+            st.session_state[f"{state_key}_stt_raw"] = trans
+            st.session_state[f"{state_key}_stt_result"] = hasil  # SIMPAN HASIL
+            st.rerun()
+        else:
+            st.warning(
+                f"Error: “{trans}” tidak dikenali.",
+                icon=":material/warning:",
+            )
+
+    # Tampilkan tips
+    st.info(
+        """
+        **Tips menggunakan input suara:**
+        - Ucapkan dengan jelas, gunakan kata **"ya"** atau **"tidak"**
+        - Hindari bicara terlalu cepat atau pelan
+        - Gunakan bahasa formal (*tidak* bukan *nggak*)
+        - Ulangi jika hasil salah
+        """
+    )
+
+    # Tampilkan transkrip terakhir (jika ada)
+    if st.session_state.get(f"{state_key}_stt_raw") and st.session_state.get(
+        f"{state_key}_stt_result"
+    ):
+        st.success(
+            f"Speech to Text: “{st.session_state.pop(f'{state_key}_stt_raw')}”, "
+            f"terdeteksi sebagai “{st.session_state.pop(f'{state_key}_stt_result')}”",
+            icon=":material/record_voice_over:",
+        )
+
+    return jawab
+
+
+def voice_to_option(text, yes_no=True):
+    text = text.lower().strip()
+
+    if yes_no:
+        ya_aliases = ["ya", "iya", "betul", "benar", "ada", "yup", "yah"]
+        tidak_aliases = [
+            "tidak",
+            "gak",
+            "nggak",
+            "enggak",
+            "ndak",
+            "tak",
+            "tidak ada",
+            "no",
+        ]
+        level_aliases = ["rendah", "normal", "tinggi"]
+        gender_aliases = ["laki-laki", "perempuan"]
+
+        if any(word in text for word in ya_aliases):
+            return "Ya"
+        elif any(word in text for word in tidak_aliases):
+            return "Tidak"
+        elif any(word in text for word in level_aliases):
+            return text.capitalize()
+        elif any(word in text for word in gender_aliases):
+            return text.capitalize()
+
+    return text  # fallback

@@ -22,4 +22,5 @@ __pycache__/
 # .streamlit/secrets.toml
 
 # Abaikan file audio hasil gtts
-output.mp3
+*.mp3
+*.wav

@@ -2,3 +2,4 @@ experta==1.9.4
 pandas==2.2.3
 streamlit==1.45.1
 gTTS==2.5.4
+streamlit_mic_recorder==0.0.8
